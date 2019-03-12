@@ -1,24 +1,33 @@
 #!/usr/bin/env Rscript
+
+# parse command line argument and construct paths for input and output data
 args = commandArgs(trailingOnly=TRUE)
 filename <- paste0(args[1],".csv", collapse = NULL)
 lat <- as.double(args[2])
+path_weather_data <- paste0("weather_data", "/", filename, collapse = NULL)
+path_output_data <- paste0("output", "/", filename, collapse = NULL)
+path_output_jpeg <- paste0("output", "/", args[1],".jpg", collapse = NULL)
+path_output_avg <- paste0("output", "/", args[1], "_avg.csv", collapse = NULL)
+
+# library needs to be installed
 library(SPEI)
-setwd("weather_data")
 # load monthly weather data for 2009 to 2017 for current location
-envdata <- read.table(header = TRUE, sep = ",",  filename)
+envdata <- read.table(header = TRUE, sep = ",", path_weather_data)
 attach(envdata)
 names(envdata)
+
 # simple med temp based model
 envdata$PET <- thornthwaite(envdata$TMED, lat)
 # calculate SPEI for 1 month sliding
 spei1 <- spei(envdata$PRCP-envdata$PET,1)
-setwd("~/output")
+
 # write SPEI calculated values
-write.csv(spei1$fitted, file = filename, row.names=FALSE)
+write.csv(spei1$fitted, file = path_output_data, row.names=FALSE)
 # plot SPEI values as graph, x axis is years, y axis is -2 (dry) to 2 (wet)
-jpeg(paste0(args[1],".jpg", collapse = NULL))
+jpeg(path_output_jpeg)
 plot(spei1, main=args[1])
 dev.off()
+
 # hardcoded sliding 3 months window (May, June, July)
 means <- c(
        mean(c(spei1$fitted[5],spei1$fitted[6],spei1$fitted[7])), 
@@ -43,5 +52,6 @@ names <- c(
 	paste0(args[1], ",2016", collapse = NULL),
 	paste0(args[1], ",2017", collapse = NULL)
       )
+
 # write 3 months average per year
-write.table(means, file = paste0(args[1], "_avg.csv", collapse = NULL), col.names = FALSE, sep = ",", row.names = names, quote = FALSE)
+write.table(means, file = path_output_avg, col.names = FALSE, sep = ",", row.names = names, quote = FALSE)
