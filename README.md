@@ -9,7 +9,7 @@ This document describes the work of team 4 :
 
 ## What was our challenge?
 + Measure the yield of a variety under different drought conditions
-+ Given the Field explorer datasets and the RL trial data, can we detect varietal differences to the summer 2018 drought?
++ Given the Field explorer datasets and the RL trial data for 2013-2017, can we detect varietal differences to the summer drought?
 
 ## Which data did we use?
 + Agrimetrics field APIs
